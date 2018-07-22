@@ -38,41 +38,65 @@ You're reading it!
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
-
-I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
-
-![alt text][image1]
-
-I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
-
-Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
+I randomly select two car images and two non-car images to compare there HOG figures. The two example images are shown as follows, the parameters of the HOG feature I am using is orient = 9 pix_per_cell = 8 cell_per_block = 2. We can find that the HOG features of the cars and non-cars are really very different from each other. We can still tell the outline of the car from the HOG image.
 
 
 ![alt text][image2]
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+Among the various combinations of parameters, I chose the following set based on best accuracy:'
+
+color_space = 'YCrCb'  
+spatial_size = (32, 32) 
+hist_bins = 32  
+orient = 9  
+pix_per_cell = 8  
+cell_per_block = 2  
+hog_channel = 'ALL'  
+spatial_feat = True  
+hist_feat = True  
+hog_feat = True`
 
 #### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+The extracted features where fed to LinearSVC model of sklearn with default setting of square-hinged loss function and l2 normalization. The trained model had accuracy of 99.93% on test dataset.
+
+The trained model along with the parameters used for training were written to a pickle file to be further used by vehicle detection pipeline.
+
+Initially I tried the GridSearchCV to find the best combination of kernal and parameter 'C' but that takes a lot of time on my machine to run everytime. I may include in the future update of the project.
 
 ### Sliding Window Search
 
 #### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+he bacis function 'find_cars()' to detect the car was used for this. It is used to extract features using hog sub-sampling and make predictions. The hog sub-sampling helps to reduce calculation time for finding HOG features and thus provided higher throughput rate.
 
-![alt text][image3]
+In the basic one, 64 was the orginal sampling rate, with 8 cells and 8 pix per cell. The step size is cells_per_step = 2, which means instead of overlap, we shift 2 cells each step.
+
+The following is the result when I set the scale to be scale = 1.5, the detection example.
+
+
+slidingwindow
+
+
+Then I used the heat map operation to take care of the multi-detection and reduce the false positive. The example images are shown below, which is basicly good.
+
+
+heatmap
+
+
+
+I have tried to directly use the one search scale scale = 1.5 with heat map with threshold = 1 to build the pipeline for video. This pipeline can be found in the function detect_vehicles(). The output video is okayish. However, the there are still some false positives shown up and sometimes. And the bounding boxes are not stable and the cars in some frame may not be detected.
+
+In order to solve these problems, I decided to use the three scales search windows.
+
 
 #### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+Ultimately I searched on three scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector. I record the positions of positive detections in each frame of the video. From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.
 
-![alt text][image4]
----
+The method find_cars_smooth() is used to detect the car. It is basicly the same as the function find_cars() defined before. However, it allows the multi-scale search. More importantly, the search is optimized by processing complete frames only once every 10 frames. The restricted search is performed by appending 50 pixel to the heatmap found in last three frames. It really helps a lot to make the detection more robust and stable.
 
 ### Video Implementation
 
@@ -84,17 +108,14 @@ Here's a [link to my video result](./project_video.mp4)
 
 I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
+#### 3. Resulted heatmaps from the pipeline:
 
-### Here are six frames and their corresponding heatmaps:
 
-![alt text][image5]
 
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
+#### 4. Discussions
+I found that in some frame of the video, there will be missed detection. I think I need to enlarge the search area. However, large area will take more time to process the image. The reason that we want to use the multi-scale search is to avoid false positive. Because the linear SVC classifier may not be the best to choose in terms of time and accuracy. I think we may want to use some better classifiers, such as the CNN or SVM with non-linear kernals.
 
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
+The other issues I face are: When there is a car behind another, the resulted boxes combine into one, its really hard to catch the small cars with this search, and processing speed of frames per second is really slow.
 
 
 
