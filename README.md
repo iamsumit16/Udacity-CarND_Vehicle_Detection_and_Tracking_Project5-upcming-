@@ -112,12 +112,6 @@ I recorded the positions of positive detections in each frame of the video.  Fro
 
 
 
-#### 4. Discussions
-I found that in some frame of the video, there will be missed detection. I think I need to enlarge the search area. However, large area will take more time to process the image. The reason that we want to use the multi-scale search is to avoid false positive. Because the linear SVC classifier may not be the best to choose in terms of time and accuracy. I think we may want to use some better classifiers, such as the CNN or SVM with non-linear kernals.
-
-The other issues I face are: When there is a car behind another, the resulted boxes combine into one, its really hard to catch the small cars with this search, and processing speed of frames per second is really slow.
-
-
 
 ---
 
@@ -125,5 +119,7 @@ The other issues I face are: When there is a car behind another, the resulted bo
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+I found that in some frame of the video, there will be missed detection. I think I need to enlarge the search area. However, large area will take more time to process the image. The reason that we want to use the multi-scale search is to avoid false positive. Because the linear SVC classifier may not be the best to choose in terms of time and accuracy. I think we may want to use some better classifiers, such as the CNN or SVM with non-linear kernals.
+
+The other issues I face are: When there is a car behind another, the resulted boxes combine into one, its really hard to catch the small cars with this search, and processing speed of frames per second is really slow.
 
