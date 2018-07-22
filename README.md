@@ -41,7 +41,7 @@ You're reading it!
 I randomly select two car images and two non-car images to compare there HOG figures. The two example images are shown as follows, the parameters of the HOG feature I am using is orient = 9 pix_per_cell = 8 cell_per_block = 2. We can find that the HOG features of the cars and non-cars are really very different from each other. We can still tell the outline of the car from the HOG image.
 
 
-![alt text][image2]
+![alt text](https://github.com/iamsumit16/Vehicle_Detection_and_Tracking_Project5/blob/master/images/hog.png)
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
@@ -77,14 +77,13 @@ In the basic one, 64 was the orginal sampling rate, with 8 cells and 8 pix per c
 The following is the result when I set the scale to be scale = 1.5, the detection example.
 
 
-slidingwindow
+![alt text](https://github.com/iamsumit16/Vehicle_Detection_and_Tracking_Project5/blob/master/images/sliding15.png)
 
 
 Then I used the heat map operation to take care of the multi-detection and reduce the false positive. The example images are shown below, which is basicly good.
 
 
-heatmap
-
+![alt text](https://github.com/iamsumit16/Vehicle_Detection_and_Tracking_Project5/blob/master/images/heatmap.png)
 
 
 I have tried to directly use the one search scale scale = 1.5 with heat map with threshold = 1 to build the pipeline for video. This pipeline can be found in the function detect_vehicles(). The output video is okayish. However, the there are still some false positives shown up and sometimes. And the bounding boxes are not stable and the cars in some frame may not be detected.
@@ -101,7 +100,7 @@ The method find_cars_smooth() is used to detect the car. It is basicly the same 
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./video_output_smooth.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
@@ -110,8 +109,7 @@ I recorded the positions of positive detections in each frame of the video.  Fro
 
 #### 3. Resulted heatmaps from the pipeline:
 
-
-
+![alt text](https://github.com/iamsumit16/Vehicle_Detection_and_Tracking_Project5/blob/master/images/heatmapss.png)
 
 ---
 
